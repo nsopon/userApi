@@ -16,7 +16,7 @@ This API support following endpoints:
 * Visual studio code 2022
 * Git
 * Post man (to test endpoints)
-* Docker and Docker desktop
+* Docker and Docker desktop (must have)
 
 # Getting Started
 1. Install Docker and Docker desktop (Skip this step if you already have it.)
