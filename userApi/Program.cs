@@ -24,6 +24,14 @@ var app = builder.Build();
 //    app.UseSwaggerUI();
 //}
 
+using (var scope = app.Services.CreateScope())
+{
+    var userApiDbContext = scope.ServiceProvider.GetRequiredService<UserApiDbContext>();
+    userApiDbContext.Database.EnsureCreated();
+    userApiDbContext.Seed();
+}
+
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
