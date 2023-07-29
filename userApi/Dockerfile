@@ -19,36 +19,56 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
 
 
-FROM centos:7 AS base
+#FROM centos:7 AS base
+#
+## Add Microsoft package repository and install ASP.NET Core
+#RUN rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm \
+    #&& yum install -y aspnetcore-runtime-6.0
+#
+## Ensure we listen on any IP Address 
+#ENV ASPNETCORE_URLS=http://+:5000
+#
+#WORKDIR /app
+#
+## ... remainder of dockerfile as before
+#FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+#WORKDIR /src
+##COPY ["userApi.csproj", "."]
+##RUN dotnet restore "./userApi.csproj"
+##COPY . .
+#
+#COPY . .
+#RUN dotnet restore
+#
+#WORKDIR "/src/."
+#RUN dotnet build -c Release -o /app/build
+#
+#FROM build AS publish
+#RUN dotnet publish -c Release -o /app/publish
+#
+#FROM base AS final
+#WORKDIR /app
+#COPY --from=publish /app/publish .
+#ENTRYPOINT ["dotnet", "userApi.dll"]
 
-# Add Microsoft package repository and install ASP.NET Core
-RUN rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm \
-    && yum install -y aspnetcore-runtime-6.0
 
-# Ensure we listen on any IP Address 
-ENV ASPNETCORE_URLS=http://+:5000
-
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
+EXPOSE 80
 
-# ... remainder of dockerfile as before
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-#COPY ["userApi.csproj", "."]
-#RUN dotnet restore "./userApi.csproj"
-#COPY . .
-
+COPY ["userApi.csproj", "."]
+RUN dotnet restore "./userApi.csproj"
 COPY . .
-RUN dotnet restore
-
 WORKDIR "/src/."
-RUN dotnet build -c Release -o /app/build
+RUN dotnet build "userApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish "userApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "userApi.dll"]
-
 

@@ -6,19 +6,17 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:5000"
+      - "5000:80"
     depends_on:
       - db
-    environment:
-      - ConnectionStrings__DefaultConnection=Server=localhost,1433;Database=USER_SERVICE_DB;User=sa;Password=Password123;MultipleActiveResultSets=true;
   
   db:
-    image: mcr.microsoft.com/mssql/server:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_server2022
     ports:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=Password123
-      - MSSQL_PID=Express
     volumes:
       - ./Script:/docker-entrypoint-initdb.d
